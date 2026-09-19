@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const recipeImageInput = document.getElementById('recipe-image');
     const fileUploadLabel = document.getElementById('file-upload-label');
     const uploadStatusText = document.getElementById('upload-status-text');
-    const imagePreviewContainer = document.getElementById('image-preview-container');
 
     const editRecipeIdInput = document.getElementById('edit-recipe-id');
     const formModeTitle = document.getElementById('form-mode-title');
@@ -49,36 +48,48 @@ document.addEventListener('DOMContentLoaded', function() {
     let dispW = 0, dispH = 0;
 
     const categoryNames = {
-        soups: '🍲 Супы', meat: '🥩 Мясо', fish: '🐟 Рыба', salads: '🥗 Салаты', bakery: '🥐 Выпечка', pancakes: '🥞 Блинчики'
+        soups: 'Супы', meat: 'Мясо', fish: 'Рыба', salads: 'Салаты', bakery: 'Выпечка', pancakes: 'Блинчики'
     };
 
     renderAll();
 
     recipeImageInput.addEventListener('change', function(e) {
-        const file = e.target.files;
-        if (file && file[0]) {
-            const fileName = file[0].name.length > 20 ? file[0].name.substring(0, 17) + '...' : file[0].name;
+        const file = e.target.files[0];
+        if (file) {
+            const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
             fileUploadLabel.classList.add('success');
-            uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
+            uploadStatusText.innerHTML = 'Выбрано: <strong>' + fileName + '</strong>';
             
             const reader = new FileReader();
             reader.onload = function(event) {
-                interactiveCropZone.style.display = 'flex';
-                cropTargetImg.src = event.target.result;
-                
-                cropZoomSlider.value = 100;
-                currentX = 0;
-                currentY = 0;
-                
-                const tempImg = new Image();
-                tempImg.onload = function() {
-                    imgWidth = tempImg.width;
-                    imgHeight = tempImg.height;
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let w = img.width;
+                    let h = img.height;
+                    const max = 600;
+                    if (w > h && w > max) { h *= max / w; w = max; }
+                    else if (h > max) { w *= max / h; h = max; }
+                    canvas.width = w;
+                    canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    interactiveCropZone.style.display = 'flex';
+                    cropTargetImg.src = compressedBase64;
+                    
+                    cropZoomSlider.value = 100;
+                    currentX = 0;
+                    currentY = 0;
+                    imgWidth = w;
+                    imgHeight = h;
                     updateImageSize();
                 };
-                tempImg.src = event.target.result;
+                img.src = event.target.result;
             };
-            reader.readAsDataURL(file[0]);
+            reader.readAsDataURL(file);
         }
     });
     function updateImageSize() {
@@ -140,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function resetUploadStatus() {
         fileUploadLabel.classList.remove('success');
-        uploadStatusText.textContent = '📸 Загрузить сочное фото';
+        uploadStatusText.textContent = 'Загрузить фото';
         interactiveCropZone.style.display = 'none';
         cropTargetImg.src = '';
     }
@@ -160,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             currentCategory = e.target.getAttribute('data-category');
-            currentShelfTitle.textContent = '🌿 Кулинарная полка: ' + categoryNames[currentCategory];
+            currentShelfTitle.textContent = 'Полка: ' + categoryNames[currentCategory];
             renderRecipes();
             closeMenu(); 
             openModal(); 
@@ -176,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const process = document.getElementById('recipe-process').value;
 
         if (!cropTargetImg.src && !idToEdit) {
-            alert('Пожалуйста, выберите фото блюда! 📸');
+            alert('Пожалуйста, выберите фото блюда!');
             return;
         }
 
@@ -194,10 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const day = String(today.getDate()).padStart(2, '0');
                 const month = String(today.getMonth() + 1).padStart(2, '0');
                 const year = today.getFullYear();
-                const formattedDate = `📅 Добавлено: ${day}.${month}.${year}`;
+                const formattedDate = `Добавлено: ${day}.${month}.${year}`;
 
                 const newRecipe = { 
-                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImage, date: formattedDate, crop: cropData 
+                    id: Date.now(), title, category, ingredients, process, image: finalImage, date: formattedDate, crop: cropData 
                 };
                 recipes.push(newRecipe);
                 recipeForm.reset();
@@ -210,7 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (idToEdit && (!recipeImageInput.files || recipeImageInput.files.length === 0)) {
             saveRecipeData(cropTargetImg.src, null);
         } else {
-            // Сохраняем чистое исходное Base64 и параметры сдвига, которые вы выбрали пальцем
             const zoom = parseFloat(cropZoomSlider.value) / 100;
             const cropSettings = {
                 x: currentX,
@@ -233,13 +243,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         interactiveCropZone.style.display = 'none'; 
         fileUploadLabel.classList.add('success');
-        uploadStatusText.innerHTML = '✓ Фото загружено (нажмите для замены)';
+        uploadStatusText.innerHTML = 'Фото загружено (нажмите для замены)';
         cropTargetImg.src = recipe.image;
         recipeImageInput.required = false; 
 
         recipeForm.classList.add('edit-mode');
-        formModeTitle.textContent = '✏️ Изменение рецепта';
-        submitFormBtn.textContent = 'Обновить рецепт 🌟';
+        formModeTitle.textContent = 'Изменение рецепта';
+        submitFormBtn.textContent = 'Обновить рецепт';
         cancelEditBtn.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -249,8 +259,8 @@ document.addEventListener('DOMContentLoaded', function() {
         recipeForm.reset();
         resetUploadStatus();
         recipeForm.classList.remove('edit-mode');
-        formModeTitle.textContent = '✨ Новый шедевр вкуса';
-        submitFormBtn.textContent = 'Добавить в книгу 🥂';
+        formModeTitle.textContent = 'Новый шедевр вкуса';
+        submitFormBtn.textContent = 'Добавить в книгу';
         cancelEditBtn.style.display = 'none';
     }
 
@@ -265,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const filtered = recipes.filter(r => (currentCategory === 'all' || r.category === currentCategory) && r.title.toLowerCase().includes(searchText));
 
         if (filtered.length === 0) {
-            recipesList.innerHTML = '<p style="text-align: center; color: #2d6a4f; font-style: italic; padding: 20px;">На полке "' + categoryNames[currentCategory] + '" пока пусто...</p>';
+            recipesList.innerHTML = '<p style="text-align: center; color: #2d6a4f; font-style: italic; padding: 20px;">На полке пока пусто...</p>';
             return;
         }
         filtered.forEach(r => recipesList.appendChild(createCard(r)));
@@ -278,13 +288,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'card-actions';
 
-        const btnEdit = document.createElement('button'); btnEdit.className = 'edit-btn'; btnEdit.textContent = 'Изменить ✏️'; btnEdit.setAttribute('data-id', recipe.id);
-        const btnDelete = document.createElement('button'); btnDelete.className = 'delete-btn'; btnDelete.textContent = 'Удалить 🗑️'; btnDelete.setAttribute('data-id', recipe.id);
+        const btnEdit = document.createElement('button'); btnEdit.className = 'edit-btn'; btnEdit.textContent = 'Изменить'; btnEdit.setAttribute('data-id', recipe.id);
+        const btnDelete = document.createElement('button'); btnDelete.className = 'delete-btn'; btnDelete.textContent = 'Удалить'; btnDelete.setAttribute('data-id', recipe.id);
 
         actionsDiv.appendChild(btnEdit); actionsDiv.appendChild(btnDelete);
 
-        let currentBadge = categoryNames[recipe.category] || '🍽️ Рецепт';
-        let displayDate = recipe.date || `📅 Добавлено: ${new Date().toLocaleDateString('ru-RU')}`;
+        let currentBadge = categoryNames[recipe.category] || 'Рецепт';
+        let displayDate = recipe.date || `Добавлено: ${new Date().toLocaleDateString('ru-RU')}`;
 
         card.innerHTML = '<div class="recipe-card-image-wrap"><img id="card-img-' + recipe.id + '" src="' + recipe.image + '"></div>' +
             '<div class="recipe-card-content">' +
@@ -292,26 +302,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<div class="recipe-date">' + displayDate + '</div>' + 
                 '<span class="recipe-badge">' + currentBadge + '</span>' +
                 '<div>' +
-                    '<div class="recipe-section-title">📋 Ингредиенты:</div>' +
+                    '<div class="recipe-section-title">Ингредиенты:</div>' +
                     '<p>' + recipe.ingredients + '</p>' +
                 '</div>' +
                 '<div>' +
-                    '<div class="recipe-section-title">👩‍🍳 Приготовление:</div>' +
+                    '<div class="recipe-section-title">Приготовление:</div>' +
                     '<p>' + recipe.process + '</p>' +
                 '</div>' +
             '</div>';
 
         card.querySelector('.recipe-card-content').appendChild(actionsDiv);
 
-        // Магия динамической подстройки CSS-стилей ракурса под итоговую карточку
         setTimeout(function() {
             const cardImg = card.querySelector('#card-img-' + recipe.id);
             if (cardImg && recipe.crop) {
                 const c = recipe.crop;
-                // Рассчитываем коэффициенты масштабирования от 200px рамки экрана к 100% карточки
                 let baseFactor = 100 / 200;
                 let scaleW = (c.w < c.h) ? 100 * c.z : (c.w * (100 / c.h)) * c.z;
-                let scaleH = (c.w < c.h) ? (c.h * (100 / c.w)) * c.z : 100 * c.z;
 
                 cardImg.style.width = scaleW + '%';
                 cardImg.style.height = 'auto';
