@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
             openModal(); 
         });
     });
-    recipeForm.addEventListener('submit', function(e) {
+       recipeForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const idToEdit = editRecipeIdInput.value;
@@ -224,8 +224,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 recipeForm.reset();
                 resetUploadStatus();
             }
+            
             saveAndRender();
-            openModal();
+            
+            // ТУТ ИСПРАВЛЕНО: Вместо открытия полки openModal() мы создаем и показываем галочку добавлено
+            showSuccessToast();
         };
 
         if (idToEdit && (!recipeImageInput.files || recipeImageInput.files.length === 0)) {
@@ -242,6 +245,19 @@ document.addEventListener('DOMContentLoaded', function() {
             saveRecipeData(cropTargetImg.src, cropSettings);
         }
     });
+
+    // Функция для плавного показа красивой всплывающей галочки
+    function showSuccessToast() {
+        let toast = document.querySelector('.toast-success');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-success';
+            toast.innerHTML = '✅ Добавлено! 🍋';
+            document.body.appendChild(toast);
+        }
+        setTimeout(() => { toast.classList.add('show'); }, 50);
+        setTimeout(() => { toast.classList.remove('show'); }, 2000); // Через 2 секунды она сама плавно исчезнет
+    }
 
     function startEditMode(recipe) {
         closeModal(); 
@@ -268,7 +284,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function exitEditMode() {
         editRecipeIdInput.value = "";
         recipeForm.reset();
@@ -374,3 +389,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function saveAndRender() { localStorage.setItem('my_recipes', JSON.stringify(recipes)); renderAll(); }
 });
+
