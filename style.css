@@ -155,4 +155,27 @@ button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 10px 25
 .btn-no:hover { background: #d8f3dc; }
 .btn-yes:hover { background: #ff3333; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); }
 
+/* СТИЛИ ДЛЯ КРАСИВОГО УВЕДОМЛЕНИЯ О ДОБАВЛЕНИИ */
+.toast-success {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    background: rgba(27, 67, 50, 0.95);
+    color: #ccff33;
+    padding: 20px 40px;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 2px solid #ccff33;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.toast-success.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
 
