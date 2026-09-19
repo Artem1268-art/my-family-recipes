@@ -1,8 +1,11 @@
 if ('serviceWorker' in navigator) {
-    // ТУТ ИСПРАВЛЕНО: Добавлен точный путь для мгновенного поиска сервис-воркера телефоном
-    navigator.serviceWorker.register('./sw.js')
-        .then(function() { console.log('PWA готов!'); })
-        .catch(function(err) { console.log('Ошибка PWA:', err); });
+    // ТУТ ИСПРАВЛЕНО: Скрипт сам находит правильный путь к папке репозитория на GitHub Pages
+    const scriptPath = document.currentScript ? document.currentScript.src : '';
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    
+    navigator.serviceWorker.register(basePath + 'sw.js', { scope: basePath })
+        .then(function() { console.log('PWA полностью разблокировано!'); })
+        .catch(function(err) { console.log('Ошибка разблокировки PWA:', err); });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -55,8 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     recipeImageInput.addEventListener('change', function(e) {
         const file = e.target.files;
-        if (file && file) {
-            const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+        if (file && file[0]) {
+            const fileName = file[0].name.length > 20 ? file[0].name.substring(0, 17) + '...' : file[0].name;
             fileUploadLabel.classList.add('success');
             uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
             
@@ -77,9 +80,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 tempImg.src = event.target.result;
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file[0]);
         }
     });
+
 
 
 
