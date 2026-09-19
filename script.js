@@ -31,10 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitFormBtn = document.getElementById('submit-form-btn');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
 
-    const interactiveCropZone = document.getElementById('interactive-crop-zone');
-    const cropTargetImg = document.getElementById('crop-target-img');
-    const cropZoomSlider = document.getElementById('crop-zoom-slider');
-
     const deleteConfirmModal = document.getElementById('delete-confirm-modal');
     const confirmYesBtn = document.getElementById('confirm-yes-btn');
     const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
@@ -42,11 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let recipes = JSON.parse(localStorage.getItem('my_recipes')) || [];
     let currentCategory = 'soups'; 
-
-    let isDragging = false;
-    let startX, startY, currentX = 0, currentY = 0;
-    let imgWidth = 0, imgHeight = 0; 
-    let dispW = 0, dispH = 0;
+    let temporaryImageBase64 = ""; // Храним сжатую картинку тут
 
     const categoryNames = {
         soups: '🍲 Супы', meat: '🥩 Мясо', fish: '🐟 Рыба', salads: '🥗 Салаты', bakery: '🥐 Выпечка', pancakes: '🥞 Блинчики'
@@ -62,9 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // ТУТ ИСПРАВЛЕНО: Сверхлёгкое и сверхустойчивое автосжатие фото без глюков
     recipeImageInput.addEventListener('change', function(e) {
-        const file = e.target.files;
-        if (file && file) {
+        const file = e.target.files[0];
+        if (file) {
             const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
             fileUploadLabel.classList.add('success');
             uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
@@ -77,92 +70,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     const ctx = canvas.getContext('2d');
                     let w = img.width;
                     let h = img.height;
-                    const max = 600;
+                    const max = 600; // Безопасный размер для localStorage телефона
                     if (w > h && w > max) { h *= max / w; w = max; }
                     else if (h > max) { w *= max / h; h = max; }
                     canvas.width = w;
                     canvas.height = h;
                     ctx.drawImage(img, 0, 0, w, h);
                     
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    temporaryImageBase64 = canvas.toDataURL('image/jpeg', 0.82);
                     
-                    interactiveCropZone.style.display = 'flex';
-                    cropTargetImg.src = compressedBase64;
-                    
-                    cropZoomSlider.value = 100;
-                    currentX = 0;
-                    currentY = 0;
-                    imgWidth = w;
-                    imgHeight = h;
-                    updateImageSize();
+                    // Показываем маленькое аккуратное превью загруженного фото
+                    imagePreviewContainer.innerHTML = '<img src="' + temporaryImageBase64 + '" alt="Превью">';
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
     });
-    function updateImageSize() {
-        const zoom = parseFloat(cropZoomSlider.value) / 100;
-        if (imgWidth < imgHeight) {
-            dispW = 200 * zoom;
-            dispH = (imgHeight * (200 / imgWidth)) * zoom;
-        } else {
-            dispH = 200 * zoom;
-            dispW = (imgWidth * (200 / imgHeight)) * zoom;
-        }
-        cropTargetImg.style.width = dispW + 'px';
-        cropTargetImg.style.height = dispH + 'px';
-        constrainPosition();
-    }
-
-    function constrainPosition() {
-        const maxLeft = 0;
-        const minLeft = 200 - dispW;
-        const maxTop = 0;
-        const minTop = 200 - dispH;
-
-        if (currentX > maxLeft) currentX = maxLeft;
-        if (currentX < minLeft) currentX = minLeft;
-        if (currentY > maxTop) currentY = maxTop;
-        if (currentY < minTop) currentY = minTop;
-
-        cropTargetImg.style.left = currentX + 'px';
-        cropTargetImg.style.top = currentY + 'px';
-    }
-
-    function startDrag(e) {
-        isDragging = true;
-        const touch = e.touches ? e.touches : e;
-        startX = touch.pageX - currentX;
-        startY = touch.pageY - currentY;
-        if (e.cancelable) e.preventDefault();
-    }
-
-    function doDrag(e) {
-        if (!isDragging) return;
-        const touch = e.touches ? e.touches : e;
-        currentX = touch.pageX - startX;
-        currentY = touch.pageY - startY;
-        constrainPosition();
-    }
-
-    function stopDrag() { isDragging = false; }
-
-    cropTargetImg.addEventListener('mousedown', startDrag);
-    window.addEventListener('mousemove', doDrag);
-    window.addEventListener('mouseup', stopDrag);
-
-    cropTargetImg.addEventListener('touchstart', startDrag, { passive: false });
-    window.addEventListener('touchmove', doDrag, { passive: false });
-    window.addEventListener('touchend', stopDrag);
-
-    cropZoomSlider.addEventListener('input', updateImageSize);
-
     function resetUploadStatus() {
         fileUploadLabel.classList.remove('success');
         uploadStatusText.textContent = '📸 Загрузить сочное фото';
-        interactiveCropZone.style.display = 'none';
-        cropTargetImg.src = '';
+        imagePreviewContainer.innerHTML = '';
+        temporaryImageBase64 = "";
     }
 
     function openMenu() { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
@@ -186,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             openModal(); 
         });
     });
-        recipeForm.addEventListener('submit', function(e) {
+    recipeForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const idToEdit = editRecipeIdInput.value;
@@ -195,16 +124,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const ingredients = document.getElementById('recipe-ingredients').value;
         const process = document.getElementById('recipe-process').value;
 
-        if (!cropTargetImg.src && !idToEdit) {
-            alert('Пожалуйста, выберите фото блюда! 📸');
+        // Если картинки нет и мы не редактируем старый рецепт — выдаём подсказку
+        if (!temporaryImageBase64 && !idToEdit) {
+            alert('Пожалуйста, сделайте или выберите фото блюда! 📸');
             return;
         }
 
-        const saveRecipeData = (finalImage, cropData) => {
+        const saveRecipeData = (finalImage) => {
             if (idToEdit) {
                 recipes = recipes.map(item => {
                     if (item.id === parseInt(idToEdit)) {
-                        return { ...item, title, category, ingredients, process, image: finalImage, crop: cropData || item.crop };
+                        return { ...item, title, category, ingredients, process, image: finalImage };
                     }
                     return item;
                 });
@@ -217,31 +147,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formattedDate = `📅 Добавлено: ${day}.${month}.${year}`;
 
                 const newRecipe = { 
-                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImage, date: formattedDate, crop: cropData 
+                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImage, date: formattedDate 
                 };
                 recipes.push(newRecipe);
                 recipeForm.reset();
                 resetUploadStatus();
             }
-            
             saveAndRender();
-            
-            // ТУТ ИСПРАВЛЕНО: Вызываем уведомление через таймаут, чтобы не вешать мобильный браузер
             setTimeout(showSuccessToast, 50);
         };
 
-        if (idToEdit && (!recipeImageInput.files || recipeImageInput.files.length === 0)) {
-            saveRecipeData(cropTargetImg.src, null);
+        // Если редактируем и не выбрали новое фото — оставляем старое
+        if (idToEdit && !temporaryImageBase64) {
+            const oldRecipe = recipes.find(item => item.id === parseInt(idToEdit));
+            saveRecipeData(oldRecipe ? oldRecipe.image : "");
         } else {
-            const zoom = parseFloat(cropZoomSlider.value) / 100;
-            const cropSettings = {
-                x: currentX,
-                y: currentY,
-                z: zoom,
-                w: imgWidth,
-                h: imgHeight
-            };
-            saveRecipeData(cropTargetImg.src, cropSettings);
+            saveRecipeData(temporaryImageBase64);
         }
     });
 
@@ -250,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!toast) {
             toast = document.createElement('div');
             toast.className = 'toast-success';
-            toast.innerHTML = '✅ Добавлено!';
+            toast.innerHTML = '✅ Добавлено! 🍋';
             document.body.appendChild(toast);
         }
         setTimeout(() => { toast.classList.add('show'); }, 30);
@@ -265,15 +186,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('recipe-ingredients').value = recipe.ingredients;
         document.getElementById('recipe-process').value = recipe.process;
         
-        interactiveCropZone.style.display = 'none'; 
         fileUploadLabel.classList.add('success');
         uploadStatusText.innerHTML = '✓ Фото загружено (нажмите для замены)';
-        cropTargetImg.src = recipe.image;
+        temporaryImageBase64 = recipe.image;
+        imagePreviewContainer.innerHTML = '<img src="' + recipe.image + '" alt="Превью">';
         recipeImageInput.required = false; 
 
         recipeForm.classList.add('edit-mode');
         formModeTitle.textContent = '✏️ Изменение рецепта';
-        submitFormBtn.textContent = 'Обновить рецепт ';
+        submitFormBtn.textContent = 'Обновить рецепт 🌟';
         cancelEditBtn.style.display = 'block';
 
         setTimeout(() => {
@@ -282,12 +203,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function exitEditMode() {
         editRecipeIdInput.value = "";
         recipeForm.reset();
         resetUploadStatus();
         recipeForm.classList.remove('edit-mode');
-        formModeTitle.textContent = ' Новый шедевр вкуса';
+        formModeTitle.textContent = '✨ Новый шедевр вкуса';
         submitFormBtn.textContent = 'Добавить в книгу 🥂';
         cancelEditBtn.style.display = 'none';
         setTimeout(() => { autoResizeTextareas.forEach(t => t.style.height = 'auto'); }, 50);
@@ -301,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderRecipes() {
         recipesList.innerHTML = '';
         const searchText = searchInput.value.toLowerCase().trim();
-        const filtered = recipes.filter(r => (currentCategory === 'all' || r.category === currentCategory) && r.title.toLowerCase().includes(searchText));
+        const filtered = recipes.filter(r => r.category === currentCategory && r.title.toLowerCase().includes(searchText));
 
         if (filtered.length === 0) {
             recipesList.innerHTML = '<p style="text-align: center; color: #2d6a4f; font-style: italic; padding: 20px;">На полке "' + categoryNames[currentCategory] + '" пока пусто...</p>';
@@ -325,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentBadge = categoryNames[recipe.category] || '🍽️ Рецепт';
         let displayDate = recipe.date || `📅 Добавлено: ${new Date().toLocaleDateString('ru-RU')}`;
 
-        card.innerHTML = '<div class="recipe-card-image-wrap"><img id="card-img-' + recipe.id + '" src="' + recipe.image + '"></div>' +
+        card.innerHTML = '<div class="recipe-card-image-wrap"><img src="' + recipe.image + '"></div>' +
             '<div class="recipe-card-content">' +
                 '<h3>' + recipe.title + '</h3>' +
                 '<div class="recipe-date">' + displayDate + '</div>' + 
@@ -341,21 +263,6 @@ document.addEventListener('DOMContentLoaded', function() {
             '</div>';
 
         card.querySelector('.recipe-card-content').appendChild(actionsDiv);
-
-        setTimeout(function() {
-            const cardImg = card.querySelector('#card-img-' + recipe.id);
-            if (cardImg && recipe.crop) {
-                const c = recipe.crop;
-                let baseFactor = 100 / 200;
-                let scaleW = (c.w < c.h) ? 100 * c.z : (c.w * (100 / c.h)) * c.z;
-
-                cardImg.style.width = scaleW + '%';
-                cardImg.style.height = 'auto';
-                cardImg.style.left = (c.x * baseFactor) + '%';
-                cardImg.style.top = (c.y * baseFactor) + '%';
-            }
-        }, 10);
-
         return card;
     }
 
