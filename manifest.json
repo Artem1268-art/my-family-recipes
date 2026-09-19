@@ -1,7 +1,7 @@
 {
-  "nav_title": "Лайм Рецепты",
-  "name": "Лаймовая Книга Рецептов",
-  "short_name": "ЛаймРецепты",
+  "nav_title": "Рецепты",
+  "name": "Книга Рецептов",
+  "short_name": "Рецепты",
   "description": "Моя уютная домашняя книга рецептов",
   "start_url": "index.html",
   "display": "standalone",
