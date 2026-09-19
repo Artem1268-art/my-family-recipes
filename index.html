@@ -66,10 +66,10 @@
 
 
 
-                                    <div class="upload-wrapper">
+                                                <div class="upload-wrapper">
                 <label class="file-upload" id="file-upload-label">
-                    <!-- ТУТ ИСПРАВЛЕНО: Добавлен атрибут capture для принудительного вызова камеры на смартфонах -->
-                    <input type="file" id="recipe-image" accept="image/*" capture="environment">
+                    <!-- ТУТ ИСПРАВЛЕНО: Убрали capture, оставили чистый accept для вызова меню выбора -->
+                    <input type="file" id="recipe-image" accept="image/*">
                     <span id="upload-status-text">📸 Загрузить сочное фото</span>
                 </label>
                 
@@ -120,4 +120,5 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
