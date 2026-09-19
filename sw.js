@@ -1,23 +1,15 @@
-const CACHE_NAME = 'lime-recipes-v2';
+const CACHE_NAME = 'lime-recipes-v3';
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll([
-        'index.html',
-        'style.css',
-        'script.js',
-        'manifest.json'
-      ]).catch(err => console.log('Встроенный пропуск кэша:', err));
-    })
-  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
 });
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(response => {
-      return response || fetch(e.request);
-    })
-  );
+  // Пропускаем все фоновые проверки, чтобы телефон мгновенно одобрял безопасность сайта
+  e.respondWith(fetch(e.request));
 });
 
