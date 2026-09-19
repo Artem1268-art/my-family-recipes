@@ -1,12 +1,8 @@
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('sw.js')
-            .then(function(reg) { 
-                console.log('PWA успешно активировано!', reg.scope); 
-            })
-            .catch(function(err) { 
-                console.log('Ошибка PWA:', err); 
-            });
+            .then(function(reg) { console.log('PWA успешно активировано!', reg.scope); })
+            .catch(function(err) { console.log('Ошибка PWA:', err); });
     });
 }
 
@@ -60,8 +56,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     recipeImageInput.addEventListener('change', function(e) {
         const file = e.target.files;
-        if (file && file) {
-            const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+        if (file && file[0]) {
+            const fileName = file[0].name.length > 20 ? file[0].name.substring(0, 17) + '...' : file[0].name;
             fileUploadLabel.classList.add('success');
             uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
             
@@ -82,15 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 tempImg.src = event.target.result;
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file[0]);
         }
     });
-
-
-
-
-
-
     function updateImageSize() {
         const zoom = parseFloat(cropZoomSlider.value) / 100;
         if (imgWidth < imgHeight) {
@@ -122,19 +112,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startDrag(e) {
         isDragging = true;
-        const pageX = e.touches ? e.touches[0].pageX : e.pageX;
-        const pageY = e.touches ? e.touches[0].pageY : e.pageY;
-        startX = pageX - currentX;
-        startY = pageY - currentY;
+        const touch = e.touches ? e.touches[0] : e;
+        startX = touch.pageX - currentX;
+        startY = touch.pageY - currentY;
         if (e.cancelable) e.preventDefault();
     }
 
     function doDrag(e) {
         if (!isDragging) return;
-        const pageX = e.touches ? e.touches[0].pageX : e.pageX;
-        const pageY = e.touches ? e.touches[0].pageY : e.pageY;
-        currentX = pageX - startX;
-        currentY = pageY - startY;
+        const touch = e.touches ? e.touches[0] : e;
+        currentX = touch.pageX - startX;
+        currentY = touch.pageY - startY;
         constrainPosition();
     }
 
@@ -178,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             openModal(); 
         });
     });
-        recipeForm.addEventListener('submit', function(e) {
+    recipeForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const idToEdit = editRecipeIdInput.value;
@@ -192,11 +180,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const saveRecipeData = (finalImageBase64) => {
+        const saveRecipeData = (finalImage, cropData) => {
             if (idToEdit) {
                 recipes = recipes.map(item => {
                     if (item.id === parseInt(idToEdit)) {
-                        return { ...item, title, category, ingredients, process, image: finalImageBase64 };
+                        return { ...item, title, category, ingredients, process, image: finalImage, crop: cropData || item.crop };
                     }
                     return item;
                 });
@@ -209,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formattedDate = `📅 Добавлено: ${day}.${month}.${year}`;
 
                 const newRecipe = { 
-                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImageBase64, date: formattedDate 
+                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImage, date: formattedDate, crop: cropData 
                 };
                 recipes.push(newRecipe);
                 recipeForm.reset();
@@ -220,24 +208,18 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         if (idToEdit && (!recipeImageInput.files || recipeImageInput.files.length === 0)) {
-            saveRecipeData(cropTargetImg.src);
+            saveRecipeData(cropTargetImg.src, null);
         } else {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const size = 500;
-            canvas.width = size;
-            canvas.height = size;
-
-            let scaleX = imgWidth / dispW;
-            let scaleY = imgHeight / dispH;
-
-            let sX = Math.abs(currentX) * scaleX;
-            let sY = Math.abs(currentY) * scaleY;
-            let sW = 200 * scaleX;
-            let sH = 200 * scaleY;
-
-            ctx.drawImage(cropTargetImg, sX, sY, sW, sH, 0, 0, size, size);
-            saveRecipeData(canvas.toDataURL('image/jpeg', 0.85));
+            // Сохраняем чистое исходное Base64 и параметры сдвига, которые вы выбрали пальцем
+            const zoom = parseFloat(cropZoomSlider.value) / 100;
+            const cropSettings = {
+                x: currentX,
+                y: currentY,
+                z: zoom,
+                w: imgWidth,
+                h: imgHeight
+            };
+            saveRecipeData(cropTargetImg.src, cropSettings);
         }
     });
 
@@ -261,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelEditBtn.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function exitEditMode() {
         editRecipeIdInput.value = "";
         recipeForm.reset();
@@ -289,7 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
         attachEvents();
     }
 
-    // ТУТ НАСТРОЕН ПЕРЕНΟΣ СТРОКИ С ДАТОЙ НАПРЯМУЮ ПОД НАЗВАНИЕ Х3
     function createCard(recipe) {
         const card = document.createElement('div');
         card.className = 'recipe-card';
@@ -304,8 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentBadge = categoryNames[recipe.category] || '🍽️ Рецепт';
         let displayDate = recipe.date || `📅 Добавлено: ${new Date().toLocaleDateString('ru-RU')}`;
 
-        // Название (h3), а сразу под ним — аккуратный блок с датой (.recipe-date)
-        card.innerHTML = '<div class="recipe-card-image-wrap"><img src="' + recipe.image + '"></div>' +
+        card.innerHTML = '<div class="recipe-card-image-wrap"><img id="card-img-' + recipe.id + '" src="' + recipe.image + '"></div>' +
             '<div class="recipe-card-content">' +
                 '<h3>' + recipe.title + '</h3>' +
                 '<div class="recipe-date">' + displayDate + '</div>' + 
@@ -321,6 +302,24 @@ document.addEventListener('DOMContentLoaded', function() {
             '</div>';
 
         card.querySelector('.recipe-card-content').appendChild(actionsDiv);
+
+        // Магия динамической подстройки CSS-стилей ракурса под итоговую карточку
+        setTimeout(function() {
+            const cardImg = card.querySelector('#card-img-' + recipe.id);
+            if (cardImg && recipe.crop) {
+                const c = recipe.crop;
+                // Рассчитываем коэффициенты масштабирования от 200px рамки экрана к 100% карточки
+                let baseFactor = 100 / 200;
+                let scaleW = (c.w < c.h) ? 100 * c.z : (c.w * (100 / c.h)) * c.z;
+                let scaleH = (c.w < c.h) ? (c.h * (100 / c.w)) * c.z : 100 * c.z;
+
+                cardImg.style.width = scaleW + '%';
+                cardImg.style.height = 'auto';
+                cardImg.style.left = (c.x * baseFactor) + '%';
+                cardImg.style.top = (c.y * baseFactor) + '%';
+            }
+        }, 10);
+
         return card;
     }
 
