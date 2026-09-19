@@ -11,12 +11,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js");
-}
-</script>
-
     
 <body>
 
@@ -126,6 +120,12 @@ if ("serviceWorker" in navigator) {
     </div>
 
     <script src="script.js"></script>
+
+    <script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js");
+}
+</script>
 
  
 </body>
