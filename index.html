@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лаймовая Книга Рецептов</title>
+    <title>Книга Рецептов</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -50,7 +50,7 @@
             <input type="text" id="recipe-title" placeholder="Название блюда" required>
             
             <select id="recipe-category" required>
-                <option value="" disabled selected hidden>💚 Выберите раздел...</option>
+                <option value="" disabled selected hidden>Выберите раздел...</option>
                 <option value="soups">🍲 Супы</option>
                 <option value="meat">🥩 Мясо</option>
                 <option value="fish">🐟 Рыба</option>
@@ -65,7 +65,7 @@
                 <label class="file-upload" id="file-upload-label">
                     <!-- ТУТ ИСПРАВЛЕНО: Убран capture, теперь телефон предложит Камеру или Галерею на выбор -->
                     <input type="file" id="recipe-image" accept="image/*">
-                    <span id="upload-status-text">📸 Загрузить сочное фото</span>
+                    <span id="upload-status-text">📸 Загрузить фото</span>
                 </label>
                 
                 <div id="interactive-crop-zone" class="interactive-crop-zone" style="display: none;">
@@ -73,10 +73,10 @@
                         <img id="crop-target-img" src="" alt="Редактируемое фото">
                     </div>
                     <div class="zoom-control">
-                        <span>🔍 Изменить масштаб:</span>
+                        <span>🔍 Масштаб:</span>
                         <input type="range" id="crop-zoom-slider" min="100" max="300" value="100">
                     </div>
-                    <p style="font-size: 12px; color: #52b788; margin: 0;">Перетаскивайте фото мышкой или пальцем прямо в рамке ↕️↔️</p>
+                    <p style="font-size: 12px; color: #52b788; margin: 0;">Перетаскивайте пальцем прямо в рамке</p>
                 </div>
                 
                 <div id="image-preview-container" class="image-preview-container"></div>
@@ -94,7 +94,7 @@
                 <button id="modal-close-btn" class="modal-close-btn">×</button>
             </div>
             <div class="search-box">
-                <input type="text" id="search-input" placeholder="🔍 Найти сочный рецепт на этой полке...">
+                <input type="text" id="search-input" placeholder="🔍 Найти рецепт на этой полке...">
             </div>
             <div id="recipes-list" class="recipes-list"></div>
         </div>
