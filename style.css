@@ -4,6 +4,7 @@ body {
     color: #1b4332;
     margin: 0;
     padding: 20px;
+    padding-top: 80px; /* Отступ сверху, чтобы зафиксированная панель не перекрывала форму */
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -25,7 +26,23 @@ body {
     z-index: 2;
 }
 
-.main-container { padding-top: 60px; }
+/* ТУТ ИСПРАВЛЕНО: Верхняя панель теперь полностью неподвижна */
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(244, 249, 233, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: flex-start;
+    z-index: 2000;
+    border-bottom: 1px solid rgba(45, 106, 79, 0.08);
+}
+.menu-toggle-btn { background: #1b4332; color: #ccff33; border: none; padding: 12px 24px; font-size: 14px; font-weight: 700; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(27, 67, 50, 0.15); transition: all 0.3s ease; }
+.menu-toggle-btn:hover { transform: translateY(-2px); }
 
 h1 { 
     text-align: center; 
@@ -46,11 +63,7 @@ h2 {
     margin-bottom: 20px; 
 }
 
-.top-actions { position: fixed; top: 20px; left: 20px; right: 20px; display: flex; justify-content: flex-start; z-index: 10; }
-.menu-toggle-btn { background: #1b4332; color: #ccff33; border: none; padding: 12px 20px; font-size: 14px; font-weight: 700; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(27, 67, 50, 0.2); transition: all 0.3s ease; }
-.menu-toggle-btn:hover { transform: translateY(-2px); }
-
-.sidebar { position: fixed; top: 0; left: -320px; width: 280px; height: 100vh; background: linear-gradient(135deg, #1b4332 0%, #081c15 100%); color: #fff; z-index: 100; padding: 30px 20px; box-shadow: 5px 0 25px rgba(0,0,0,0.3); transition: left 0.4s cubic-bezier(0.77, 0, 0.175, 1); box-sizing: border-box; border-right: 4px solid #ccff33; display: flex; flex-direction: column; }
+.sidebar { position: fixed; top: 0; left: -320px; width: 280px; height: 100vh; background: linear-gradient(135deg, #1b4332 0%, #081c15 100%); color: #fff; z-index: 3000; padding: 30px 20px; box-shadow: 5px 0 25px rgba(0,0,0,0.3); transition: left 0.4s cubic-bezier(0.77, 0, 0.175, 1); box-sizing: border-box; border-right: 4px solid #ccff33; display: flex; flex-direction: column; }
 .sidebar.open { left: 0; }
 .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; }
 .sidebar-header h3 { margin: 0; color: #ccff33; font-size: 1.4rem; }
@@ -65,13 +78,22 @@ h2 {
 .sidebar-footer { font-size: 13px; color: rgba(255, 255, 255, 0.4); text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px; margin-top: 20px; font-style: italic; letter-spacing: 0.5px; }
 .sidebar-footer span { color: #ccff33; font-weight: 700; font-style: normal; }
 
-.sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 99; display: none; opacity: 0; transition: opacity 0.3s ease; }
+.sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 2500; display: none; opacity: 0; transition: opacity 0.3s ease; }
 .sidebar-overlay.show { display: block; opacity: 1; }
 
 .recipe-form { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(15px); padding: 30px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 12px 40px rgba(45, 106, 79, 0.06); display: flex; flex-direction: column; gap: 20px; transition: border 0.3s ease, box-shadow 0.3s ease; }
 input[type="text"], textarea, select { width: 100%; padding: 16px; border: 1px solid rgba(183, 239, 197, 0.7); border-radius: 16px; font-size: 16px; background-color: rgba(255, 255, 255, 0.9); color: #1b4332; box-sizing: border-box; transition: all 0.3s ease; font-family: inherit;}
 input[type="text"]:focus, textarea:focus, select:focus { outline: none; border-color: #52b788; background-color: #fff; box-shadow: 0 0 0 4px rgba(82, 183, 136, 0.15); }
 select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://w3.org' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232d6a4f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; padding-right: 40px; -webkit-appearance: none;}
+
+/* ТУТ ИСПРАВЛЕНО: Запрещено ручное изменение размера окон, включен авто-рост вниз */
+textarea.auto-resize {
+    resize: none;
+    overflow-y: hidden;
+    min-height: 90px;
+    transition: height 0.1s ease;
+}
+
 .recipe-form.edit-mode { border: 2px solid #3a86c8; box-shadow: 0 12px 40px rgba(58, 134, 200, 0.15); }
 .upload-wrapper { display: flex; flex-direction: column; gap: 15px; }
 .file-upload { display: block; text-align: center; padding: 18px; background: linear-gradient(135deg, #f4f9e9 0%, #e8f5e9 100%); border: 2px dashed #95d5b2; border-radius: 16px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; color: #2d6a4f; -webkit-tap-highlight-color: transparent; }
@@ -93,10 +115,10 @@ select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-
 
 button[type="submit"] { background: linear-gradient(135deg, #ccff33 0%, #9ef01a 100%); color: #1b4332; border: none; padding: 16px; font-size: 18px; font-weight: 700; border-radius: 16px; cursor: pointer; box-shadow: 0 6px 20px rgba(158, 240, 26, 0.3); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); -webkit-tap-highlight-color: transparent; }
 button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(158, 240, 26, 0.5); }
-.cancel-edit-btn { background: #e0e0e0; color: #444; border: none; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 16px; cursor: pointer; transition: 0.2s; }
+.cancel-edit-btn { background: #e0e0e0; color: #444; border: none; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 16px; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
 .cancel-edit-btn:hover { background: #d5d5d5; }
 
-.recipes-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(27, 67, 50, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 200; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+.recipes-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(27, 67, 50, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 4000; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
 .recipes-modal.open { opacity: 1; pointer-events: auto; }
 .modal-content { background: #f4f9e9; width: 100%; max-width: 650px; height: 90vh; border-radius: 32px 32px 0 0; padding: 30px 25px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); box-sizing: border-box; overflow-y: auto; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); }
 .recipes-modal.open .modal-content { transform: translateY(0); }
@@ -107,25 +129,11 @@ button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 10px 25
 
 .recipes-list { display: flex; flex-direction: column; gap: 25px; }
 .recipe-card { background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px rgba(27, 67, 50, 0.04); border: 1px solid rgba(183, 239, 197, 0.2); }
-
-/* ТУТ ИСПРАВЛЕНО: Магия CSS-масштабирования ракурса. Картинка больше никогда не будет черной! */
-.recipe-card-image-wrap { 
-    width: 100%; 
-    aspect-ratio: 1 / 1; 
-    overflow: hidden; 
-    position: relative; 
-    background-color: #f0f0f0; 
-}
-.recipe-card-image-wrap img { 
-    position: absolute;
-    transform-origin: top left;
-    width: 100%;
-    height: auto;
-}
-
+.recipe-card-image-wrap { width: 100%; aspect-ratio: 1 / 1; overflow: hidden; position: relative; background-color: #f0f0f0; }
+.recipe-card-image-wrap img { position: absolute; transform-origin: top left; width: 100%; height: auto; }
 .recipe-card-content { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
 .recipe-card h3 { margin: 0; color: #1b4332; font-size: 1.5rem; font-weight: 800; }
-.recipe-badge { display: inline-block; background: #d8f3dc; color: #1b4332; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 10px; align-self: flex-start; }
+.recipe-badge { display: inline-block; background: #d8f3dc; color: #1b4332; font-size: 12px; padding: 5px 12px; border-radius: 10px; align-self: flex-start; font-weight: 700; }
 .recipe-date { font-size: 12px; color: #74c69d; font-style: italic; margin-top: -5px; }
 .recipe-section-title { font-weight: 700; font-size: 12px; color: #52b788; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
 .recipe-card p { margin: 0; white-space: pre-wrap; color: #40916c; font-size: 15px; line-height: 1.6; }
@@ -146,4 +154,5 @@ button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 10px 25
 .btn-yes { background: #ff4d4d; color: white; }
 .btn-no:hover { background: #d8f3dc; }
 .btn-yes:hover { background: #ff3333; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); }
+
 
