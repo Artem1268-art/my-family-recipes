@@ -1,5 +1,6 @@
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
+    // ТУТ ИСПРАВЛЕНО: Добавлен точный путь для мгновенного поиска сервис-воркера телефоном
+    navigator.serviceWorker.register('./sw.js')
         .then(function() { console.log('PWA готов!'); })
         .catch(function(err) { console.log('Ошибка PWA:', err); });
 }
@@ -39,8 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let recipeIdToDelete = null;
 
     let recipes = JSON.parse(localStorage.getItem('my_recipes')) || [];
-    
-    // ТУТ ИСПРАВЛЕНО: Стартовым разделом по умолчанию теперь выбраны Супы
     let currentCategory = 'soups'; 
 
     let isDragging = false;
@@ -48,9 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let imgWidth = 0, imgHeight = 0; 
     let dispW = 0, dispH = 0;
 
-    // Из списка имён стёрт пункт 'all'
     const categoryNames = {
-        soups: '🍲 Супы', meat: '🥩 Мясо', fish: '🐟 Рыба', salads: '🥗 Салаты', bakery: '🧁 Выпечка', pancakes: '🥞 Блинчики'
+        soups: '🍲 Супы', meat: '🥩 Мясо', fish: '🐟 Рыба', salads: '🥗 Салаты', bakery: '🥐 Выпечка', pancakes: '🥞 Блинчики'
     };
 
     renderAll();
@@ -82,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsDataURL(file);
         }
     });
+
 
 
 
