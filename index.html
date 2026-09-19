@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лаймовая Книга Рецептов</title>
+    <title>Книга Рецептов</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -35,7 +35,7 @@
         </div>
         
         <div class="sidebar-footer">
-            🛠️ Creator: <span>Ваше Имя</span>
+            🛠️ Creator: <span>Artem Osipov</span>
         </div>
     </div>
     
@@ -50,7 +50,7 @@
             <input type="text" id="recipe-title" placeholder="Название блюда" required>
             
             <select id="recipe-category" required>
-                <option value="" disabled selected hidden>💚 Выберите раздел...</option>
+                <option value="" disabled selected hidden>Выберите раздел...</option>
                 <option value="soups">🍲 Супы</option>
                 <option value="meat">🥩 Мясо</option>
                 <option value="fish">🐟 Рыба</option>
@@ -64,7 +64,7 @@
             <div class="upload-wrapper">
                 <label class="file-upload" id="file-upload-label">
                     <input type="file" id="recipe-image" accept="image/*">
-                    <span id="upload-status-text">📸 Загрузить сочное фото</span>
+                    <span id="upload-status-text">📸 Загрузить фото</span>
                 </label>
                 
                 <!-- Рамка кропа и ползунок удалены, остался только легкий предпросмотр -->
@@ -83,7 +83,7 @@
                 <button id="modal-close-btn" class="modal-close-btn">×</button>
             </div>
             <div class="search-box">
-                <input type="text" id="search-input" placeholder="🔍 Найти сочный рецепт на этой полке...">
+                <input type="text" id="search-input" placeholder="🔍 Найти рецепт на этой полке...">
             </div>
             <div id="recipes-list" class="recipes-list"></div>
         </div>
