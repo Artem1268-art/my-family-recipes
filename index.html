@@ -9,16 +9,16 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1b4332">
+    <link rel="apple-touch-icon" href="https://flaticon.com">
     <link rel="stylesheet" href="style.css">
 </head>
-
-    
 <body>
 
     <div class="decor-circle circle-1"></div>
     <div class="decor-circle circle-2"></div>
 
-    <div class="top-actions">
+    <!-- ТУТ ИСПРАВЛЕНО: Создана неподвижная верхняя панель -->
+    <div class="top-navbar">
         <button id="menu-toggle-btn" class="menu-toggle-btn">📚 Разделы</button>
     </div>
 
@@ -32,47 +32,41 @@
             <button class="tab-btn" data-category="meat">🥩 Мясо</button>
             <button class="tab-btn" data-category="fish">🐟 Рыба</button>
             <button class="tab-btn" data-category="salads">🥗 Салаты</button>
-            <button class="tab-btn" data-category="bakery">🧁 Выпечка</button>
+            <button class="tab-btn" data-category="bakery">🥐 Выпечка</button>
             <button class="tab-btn" data-category="pancakes">🥞 Блинчики</button>
         </div>
         
         <div class="sidebar-footer">
-            🛠️ Creator: <span>Artem Osipov</span>
+            🛠️ Creator: <span>Ваше Имя</span>
         </div>
     </div>
     
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
     <div class="container main-container">
-        <!-- ТУТ ИСПРАВЛЕНО: Чистый заголовок приложения -->
         <h1>Книга рецептов</h1>
         
         <form id="recipe-form" class="recipe-form">
-            <!-- ТУТ ИСПРАВЛЕНО: Убран стикер из названия формы -->
             <h2 id="form-mode-title">Новый шедевр вкуса</h2>
             <input type="hidden" id="edit-recipe-id" value="">
             <input type="text" id="recipe-title" placeholder="Название блюда" required>
             
             <select id="recipe-category" required>
-                <option value="" disabled selected hidden>⚙️ Выберите раздел...</option>
+                <option value="" disabled selected hidden>💚 Выберите раздел...</option>
                 <option value="soups">🍲 Супы</option>
                 <option value="meat">🥩 Мясо</option>
                 <option value="fish">🐟 Рыба</option>
                 <option value="salads">🥗 Салаты</option>
-                <option value="bakery">🧁 Выпечка</option>
+                <option value="bakery">🥐 Выпечка</option>
                 <option value="pancakes">🥞 Блинчики</option>
             </select>
 
-            <textarea id="recipe-ingredients" placeholder="📋 Список ингредиентов..." rows="4" required></textarea>
-            <textarea id="recipe-process" placeholder="👩‍🍳 Процесс приготовления..." rows="5" required></textarea>
-
-
-
-
-                                                <div class="upload-wrapper">
+            <!-- ТУТ ИСПРАВЛЕНО: Добавлен класс auto-resize для умного роста окон вниз -->
+            <textarea id="recipe-ingredients" class="auto-resize" placeholder="📋 Список ингредиентов..." rows="3" required></textarea>
+            <textarea id="recipe-process" class="auto-resize" placeholder="👩‍🍳 Процесс приготовления..." rows="4" required></textarea>
+            <div class="upload-wrapper">
                 <label class="file-upload" id="file-upload-label">
-                    <!-- ТУТ ИСПРАВЛЕНО: Убрали capture, оставили чистый accept для вызова меню выбора -->
-                    <input type="file" id="recipe-image" accept="image/*">
+                    <input type="file" id="recipe-image" accept="image/*" capture="environment">
                     <span id="upload-status-text">📸 Загрузить сочное фото</span>
                 </label>
                 
@@ -98,7 +92,7 @@
     <div id="recipes-modal" class="recipes-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="current-shelf-title">🌿 Кулинарная полка: Все</h2>
+                <h2 id="current-shelf-title">🌿 Кулинарная полка: Супы</h2>
                 <button id="modal-close-btn" class="modal-close-btn">×</button>
             </div>
             <div class="search-box">
@@ -121,15 +115,8 @@
     </div>
 
     <script src="script.js"></script>
-
-    <script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
-}
-</script>
-
- 
 </body>
 </html>
+
 
 
