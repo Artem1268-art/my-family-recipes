@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         recipeImageInput.required = false; 
 
         recipeForm.classList.add('edit-mode');
-        formModeTitle.textContent = '✏️ Изменение рецепта';
+        formModeTitle.textContent = 'Изменение рецепта';
         submitFormBtn.textContent = 'Обновить рецепт 🌟';
         cancelEditBtn.style.display = 'block';
 
