@@ -62,21 +62,48 @@ h2 {
     margin-bottom: 20px; 
 }
 
-/* ТУТ ИСПРАВЛЕНО: Меню теперь flex-контейнер, чтобы подпись всегда прижималась к низу */
-.sidebar { position: fixed; top: 0; left: -320px; width: 280px; height: 100vh; background: linear-gradient(135deg, #1b4332 0%, #081c15 100%); color: #fff; z-index: 3000; padding: 30px 20px; box-shadow: 5px 0 25px rgba(0,0,0,0.3); transition: left 0.4s cubic-bezier(0.77, 0, 0.175, 1); box-sizing: border-box; border-right: 4px solid #ccff33; display: flex; flex-direction: column; }
+.sidebar { 
+    position: fixed; 
+    top: 0; 
+    left: -320px; 
+    width: 280px; 
+    height: 100vh; 
+    background: linear-gradient(135deg, #1b4332 0%, #081c15 100%); 
+    color: #fff; 
+    z-index: 3000; 
+    padding: 30px 20px; 
+    box-shadow: 5px 0 25px rgba(0,0,0,0.3); 
+    transition: left 0.4s cubic-bezier(0.77, 0, 0.175, 1); 
+    box-sizing: border-box; 
+    border-right: 4px solid #ccff33; 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto; 
+}
 .sidebar.open { left: 0; }
-.sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; }
+.sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px; shrink: 0; }
 .sidebar-header h3 { margin: 0; color: #ccff33; font-size: 1.4rem; }
 .menu-close-btn, .modal-close-btn { background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.7; transition: 0.2s; }
 .menu-close-btn:hover { opacity: 1; color: #ff4d4d; }
 
-.sidebar-tabs { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
+/* Отключаем растягивание вкладок на всю высоту, чтобы освободить место */
+.sidebar-tabs { display: flex; flex-direction: column; gap: 12px; flex-grow: 0; }
 .sidebar-tabs .tab-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 14px 20px; border-radius: 14px; cursor: pointer; font-size: 16px; font-weight: 600; text-align: left; transition: all 0.2s ease; width: 100%; box-sizing: border-box;}
 .sidebar-tabs .tab-btn:hover { background: rgba(255,255,255,0.15); padding-left: 25px; }
 .sidebar-tabs .tab-btn.active { background: #ccff33; color: #1b4332; border-color: #ccff33; box-shadow: 0 4px 15px rgba(204, 255, 51, 0.3); }
 
-/* ТУТ ИСПРАВЛЕНО: Красивые стили для именной подписи */
-.sidebar-footer { font-size: 13px; color: rgba(255, 255, 255, 0.4); text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px; margin-top: 20px; font-style: italic; letter-spacing: 0.5px; }
+/* ТУТ ИСПРАВЛЕНО: Подпись автора отодвинута ровно на 80 пикселей (2.5 см) вниз под разделы */
+.sidebar-footer { 
+    font-size: 13px; 
+    color: rgba(255, 255, 255, 0.5); 
+    text-align: center; 
+    border-top: 1px solid rgba(255, 255, 255, 0.15); 
+    padding-top: 15px; 
+    margin-top: 80px; 
+    font-style: italic; 
+    letter-spacing: 0.5px; 
+    shrink: 0; 
+}
 .sidebar-footer span { color: #ccff33; font-weight: 700; font-style: normal; }
 
 .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 2500; display: none; opacity: 0; transition: opacity 0.3s ease; }
@@ -89,6 +116,7 @@ select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-
 
 textarea.auto-resize { resize: none; overflow-y: hidden; min-height: 90px; transition: height 0.1s ease; }
 .recipe-form.edit-mode { border: 2px solid #3a86c8; box-shadow: 0 12px 40px rgba(58, 134, 200, 0.15); }
+
 .upload-wrapper { display: flex; flex-direction: column; gap: 15px; }
 .file-upload { display: block; text-align: center; padding: 18px; background: linear-gradient(135deg, #f4f9e9 0%, #e8f5e9 100%); border: 2px dashed #95d5b2; border-radius: 16px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; color: #2d6a4f; -webkit-tap-highlight-color: transparent; }
 .file-upload:hover { background: #d8f3dc; border-color: #52b788; }
