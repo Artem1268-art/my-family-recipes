@@ -6,17 +6,5 @@
   "display": "standalone",
   "background_color": "#f4f9e9",
   "theme_color": "#1b4332",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "./icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "./icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ]
+  "orientation": "portrait"
 }
