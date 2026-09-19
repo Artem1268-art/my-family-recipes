@@ -1,17 +1,24 @@
 {
   "short_name": "Рецепты",
-  "name": "Лайм & Лимон Книга Рецептов",
-  "icons": [
-    {
-      "src": "https://flaticon.com",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
-    }
-  ],
-  "start_url": ".",
+  "name": "Лайм & Лимон — Книга Рецептов",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
   "background_color": "#f4f9e9",
   "theme_color": "#1b4332",
-  "display": "standalone",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    }
+  ]
 }
