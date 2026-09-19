@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!toast) {
             toast = document.createElement('div');
             toast.className = 'toast-success';
-            toast.innerHTML = '✅ Добавлено!';
+            toast.innerHTML = 'Добавлено!';
             document.body.appendChild(toast);
         }
         setTimeout(() => { toast.classList.add('show'); }, 30);
