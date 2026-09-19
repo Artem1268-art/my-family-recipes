@@ -10,6 +10,14 @@
     <meta name="theme-color" content="#1b4332">
     <link rel="stylesheet" href="style.css">
 </head>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
+</script>
+
+    
 <body>
 
     <div class="decor-circle circle-1"></div>
@@ -119,19 +127,7 @@
 
     <script src="script.js"></script>
 
-    <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(() => {
-                console.log('Service Worker зарегистрирован');
-            })
-            .catch(error => {
-                console.error('Ошибка Service Worker:', error);
-            });
-    });
-}
-</script>
+ 
 </body>
 </html>
 
