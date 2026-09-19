@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const recipeImageInput = document.getElementById('recipe-image');
     const fileUploadLabel = document.getElementById('file-upload-label');
     const uploadStatusText = document.getElementById('upload-status-text');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
 
     const editRecipeIdInput = document.getElementById('edit-recipe-id');
     const formModeTitle = document.getElementById('form-mode-title');
@@ -48,17 +49,26 @@ document.addEventListener('DOMContentLoaded', function() {
     let dispW = 0, dispH = 0;
 
     const categoryNames = {
-        soups: 'Супы', meat: 'Мясо', fish: 'Рыба', salads: 'Салаты', bakery: 'Выпечка', pancakes: 'Блинчики'
+        soups: '🍲 Супы', meat: '🥩 Мясо', fish: '🐟 Рыба', salads: '🥗 Салаты', bakery: '🥐 Выпечка', pancakes: '🥞 Блинчики'
     };
 
     renderAll();
 
+    // ТУТ ИСПРАВЛЕНО: Скрипт сам увеличивает текстовые окна вниз при вводе длинного текста
+    const autoResizeTextareas = document.querySelectorAll('textarea.auto-resize');
+    autoResizeTextareas.forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+
     recipeImageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+        const file = e.target.files;
+        if (file && file[0]) {
+            const fileName = file[0].name.length > 20 ? file[0].name.substring(0, 17) + '...' : file[0].name;
             fileUploadLabel.classList.add('success');
-            uploadStatusText.innerHTML = 'Выбрано: <strong>' + fileName + '</strong>';
+            uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
             
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -89,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 img.src = event.target.result;
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file[0]);
         }
     });
     function updateImageSize() {
@@ -151,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function resetUploadStatus() {
         fileUploadLabel.classList.remove('success');
-        uploadStatusText.textContent = 'Загрузить фото';
+        uploadStatusText.textContent = '📸 Загрузить сочное фото';
         interactiveCropZone.style.display = 'none';
         cropTargetImg.src = '';
     }
@@ -171,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             currentCategory = e.target.getAttribute('data-category');
-            currentShelfTitle.textContent = 'Полка: ' + categoryNames[currentCategory];
+            currentShelfTitle.textContent = '🌿 Кулинарная полка: ' + categoryNames[currentCategory];
             renderRecipes();
             closeMenu(); 
             openModal(); 
@@ -187,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const process = document.getElementById('recipe-process').value;
 
         if (!cropTargetImg.src && !idToEdit) {
-            alert('Пожалуйста, выберите фото блюда!');
+            alert('Пожалуйста, выберите фото блюда! 📸');
             return;
         }
 
@@ -205,10 +215,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const day = String(today.getDate()).padStart(2, '0');
                 const month = String(today.getMonth() + 1).padStart(2, '0');
                 const year = today.getFullYear();
-                const formattedDate = `Добавлено: ${day}.${month}.${year}`;
+                const formattedDate = `📅 Добавлено: ${day}.${month}.${year}`;
 
                 const newRecipe = { 
-                    id: Date.now(), title, category, ingredients, process, image: finalImage, date: formattedDate, crop: cropData 
+                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImage, date: formattedDate, crop: cropData 
                 };
                 recipes.push(newRecipe);
                 recipeForm.reset();
@@ -243,14 +253,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         interactiveCropZone.style.display = 'none'; 
         fileUploadLabel.classList.add('success');
-        uploadStatusText.innerHTML = 'Фото загружено (нажмите для замены)';
+        uploadStatusText.innerHTML = '✓ Фото загружено (нажмите для замены)';
         cropTargetImg.src = recipe.image;
         recipeImageInput.required = false; 
 
         recipeForm.classList.add('edit-mode');
-        formModeTitle.textContent = 'Изменение рецепта';
-        submitFormBtn.textContent = 'Обновить рецепт';
+        formModeTitle.textContent = '✏️ Изменение рецепта';
+        submitFormBtn.textContent = 'Обновить рецепт 🌟';
         cancelEditBtn.style.display = 'block';
+
+        setTimeout(() => {
+            autoResizeTextareas.forEach(t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; });
+        }, 50);
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -259,9 +274,10 @@ document.addEventListener('DOMContentLoaded', function() {
         recipeForm.reset();
         resetUploadStatus();
         recipeForm.classList.remove('edit-mode');
-        formModeTitle.textContent = 'Новый шедевр вкуса';
-        submitFormBtn.textContent = 'Добавить в книгу';
+        formModeTitle.textContent = '✨ Новый шедевр вкуса';
+        submitFormBtn.textContent = 'Добавить в книгу 🥂';
         cancelEditBtn.style.display = 'none';
+        setTimeout(() => { autoResizeTextareas.forEach(t => t.style.height = 'auto'); }, 50);
     }
 
     cancelEditBtn.addEventListener('click', exitEditMode);
@@ -275,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const filtered = recipes.filter(r => (currentCategory === 'all' || r.category === currentCategory) && r.title.toLowerCase().includes(searchText));
 
         if (filtered.length === 0) {
-            recipesList.innerHTML = '<p style="text-align: center; color: #2d6a4f; font-style: italic; padding: 20px;">На полке пока пусто...</p>';
+            recipesList.innerHTML = '<p style="text-align: center; color: #2d6a4f; font-style: italic; padding: 20px;">На полке "' + categoryNames[currentCategory] + '" пока пусто...</p>';
             return;
         }
         filtered.forEach(r => recipesList.appendChild(createCard(r)));
@@ -288,13 +304,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const actionsDiv = document.createElement('div');
         actionsDiv.className = 'card-actions';
 
-        const btnEdit = document.createElement('button'); btnEdit.className = 'edit-btn'; btnEdit.textContent = 'Изменить'; btnEdit.setAttribute('data-id', recipe.id);
-        const btnDelete = document.createElement('button'); btnDelete.className = 'delete-btn'; btnDelete.textContent = 'Удалить'; btnDelete.setAttribute('data-id', recipe.id);
+        const btnEdit = document.createElement('button'); btnEdit.className = 'edit-btn'; btnEdit.textContent = 'Изменить ✏️'; btnEdit.setAttribute('data-id', recipe.id);
+        const btnDelete = document.createElement('button'); btnDelete.className = 'delete-btn'; btnDelete.textContent = 'Удалить 🗑️'; btnDelete.setAttribute('data-id', recipe.id);
 
         actionsDiv.appendChild(btnEdit); actionsDiv.appendChild(btnDelete);
 
-        let currentBadge = categoryNames[recipe.category] || 'Рецепт';
-        let displayDate = recipe.date || `Добавлено: ${new Date().toLocaleDateString('ru-RU')}`;
+        let currentBadge = categoryNames[recipe.category] || '🍽️ Рецепт';
+        let displayDate = recipe.date || `📅 Добавлено: ${new Date().toLocaleDateString('ru-RU')}`;
 
         card.innerHTML = '<div class="recipe-card-image-wrap"><img id="card-img-' + recipe.id + '" src="' + recipe.image + '"></div>' +
             '<div class="recipe-card-content">' +
@@ -302,11 +318,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 '<div class="recipe-date">' + displayDate + '</div>' + 
                 '<span class="recipe-badge">' + currentBadge + '</span>' +
                 '<div>' +
-                    '<div class="recipe-section-title">Ингредиенты:</div>' +
+                    '<div class="recipe-section-title">📋 Ингредиенты:</div>' +
                     '<p>' + recipe.ingredients + '</p>' +
                 '</div>' +
                 '<div>' +
-                    '<div class="recipe-section-title">Приготовление:</div>' +
+                    '<div class="recipe-section-title">👩‍🍳 Приготовление:</div>' +
                     '<p>' + recipe.process + '</p>' +
                 '</div>' +
             '</div>';
