@@ -6,7 +6,6 @@
     <title>Лаймовая Книга Рецептов</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1b4332">
     <link rel="apple-touch-icon" href="https://flaticon.com">
@@ -17,7 +16,6 @@
     <div class="decor-circle circle-1"></div>
     <div class="decor-circle circle-2"></div>
 
-    <!-- ТУТ ИСПРАВЛЕНО: Создана неподвижная верхняя панель -->
     <div class="top-navbar">
         <button id="menu-toggle-btn" class="menu-toggle-btn">📚 Разделы</button>
     </div>
@@ -61,12 +59,12 @@
                 <option value="pancakes">🥞 Блинчики</option>
             </select>
 
-            <!-- ТУТ ИСПРАВЛЕНО: Добавлен класс auto-resize для умного роста окон вниз -->
             <textarea id="recipe-ingredients" class="auto-resize" placeholder="📋 Список ингредиентов..." rows="3" required></textarea>
             <textarea id="recipe-process" class="auto-resize" placeholder="👩‍🍳 Процесс приготовления..." rows="4" required></textarea>
             <div class="upload-wrapper">
                 <label class="file-upload" id="file-upload-label">
-                    <input type="file" id="recipe-image" accept="image/*" capture="environment">
+                    <!-- ТУТ ИСПРАВЛЕНО: Убран capture, теперь телефон предложит Камеру или Галерею на выбор -->
+                    <input type="file" id="recipe-image" accept="image/*">
                     <span id="upload-status-text">📸 Загрузить сочное фото</span>
                 </label>
                 
@@ -115,12 +113,6 @@
     </div>
 
     <script src="script.js"></script>
-
-    <script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
-}
-</script>
 </body>
 </html>
 
