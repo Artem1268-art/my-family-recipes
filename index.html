@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лаймовая Книга Рецептов</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1b4332">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="decor-circle circle-1"></div>
+    <div class="decor-circle circle-2"></div>
+
+    <div class="top-actions">
+        <button id="menu-toggle-btn" class="menu-toggle-btn">📚 Разделы</button>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>📖 Главы книги</h3>
+            <button id="menu-close-btn" class="menu-close-btn">×</button>
+        </div>
+        <div class="sidebar-tabs">
+            <button class="tab-btn active" data-category="soups">🍲 Супы</button>
+            <button class="tab-btn" data-category="meat">🥩 Мясо</button>
+            <button class="tab-btn" data-category="fish">🐟 Рыба</button>
+            <button class="tab-btn" data-category="salads">🥗 Салаты</button>
+            <button class="tab-btn" data-category="bakery">🧁 Выпечка</button>
+            <button class="tab-btn" data-category="pancakes">🥞 Блинчики</button>
+        </div>
+        
+        <div class="sidebar-footer">
+            🛠️ Creator: <span>Artem Osipov</span>
+        </div>
+    </div>
+    
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <div class="container main-container">
+        <!-- ТУТ ИСПРАВЛЕНО: Чистый заголовок приложения -->
+        <h1>Книга рецептов</h1>
+        
+        <form id="recipe-form" class="recipe-form">
+            <!-- ТУТ ИСПРАВЛЕНО: Убран стикер из названия формы -->
+            <h2 id="form-mode-title">Новый шедевр вкуса</h2>
+            <input type="hidden" id="edit-recipe-id" value="">
+            <input type="text" id="recipe-title" placeholder="Название блюда" required>
+            
+            <select id="recipe-category" required>
+                <option value="" disabled selected hidden>⚙️ Выберите раздел...</option>
+                <option value="soups">🍲 Супы</option>
+                <option value="meat">🥩 Мясо</option>
+                <option value="fish">🐟 Рыба</option>
+                <option value="salads">🥗 Салаты</option>
+                <option value="bakery">🧁 Выпечка</option>
+                <option value="pancakes">🥞 Блинчики</option>
+            </select>
+
+            <textarea id="recipe-ingredients" placeholder="📋 Список ингредиентов..." rows="4" required></textarea>
+            <textarea id="recipe-process" placeholder="👩‍🍳 Процесс приготовления..." rows="5" required></textarea>
+
+
+
+
+                        <div class="upload-wrapper">
+                <label class="file-upload" id="file-upload-label">
+                    <input type="file" id="recipe-image" accept="image/*">
+                    <span id="upload-status-text">📸 Загрузить фото</span>
+                </label>
+                
+                <div id="interactive-crop-zone" class="interactive-crop-zone" style="display: none;">
+                    <div class="crop-frame">
+                        <img id="crop-target-img" src="" alt="Редактируемое фото">
+                    </div>
+                    <div class="zoom-control">
+                        <span>🔍 Изменить масштаб:</span>
+                        <input type="range" id="crop-zoom-slider" min="100" max="300" value="100">
+                    </div>
+                    <p style="font-size: 12px; color: #52b788; margin: 0;">Перетаскивайте фото пальцем прямо в рамке</p>
+                </div>
+                
+                <div id="image-preview-container" class="image-preview-container"></div>
+            </div>
+
+            <button type="submit" id="submit-form-btn">Добавить в книгу 🥂</button>
+            <button type="button" id="cancel-edit-btn" class="cancel-edit-btn" style="display: none;">Отменить редактирование 🚫</button>
+        </form>
+    </div>
+
+    <div id="recipes-modal" class="recipes-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="current-shelf-title">🌿 Кулинарная полка: Все</h2>
+                <button id="modal-close-btn" class="modal-close-btn">×</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="🔍 Найти рецепт на этой полке...">
+            </div>
+            <div id="recipes-list" class="recipes-list"></div>
+        </div>
+    </div>
+
+    <div id="delete-confirm-modal" class="custom-confirm-modal">
+        <div class="confirm-modal-content">
+            <div class="confirm-icon">🗑️</div>
+            <h3>Удалить рецепт?</h3>
+            <p>Вы точно хотите навсегда стереть этот кулинарный шедевр? Восстановить его не получится.</p>
+            <div class="confirm-actions">
+                <button id="confirm-cancel-btn" class="confirm-btn btn-no">Нет, оставить 🚫</button>
+                <button id="confirm-yes-btn" class="confirm-btn btn-yes">Да, удалить 🔥</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

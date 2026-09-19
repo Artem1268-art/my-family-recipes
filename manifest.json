@@ -1,0 +1,17 @@
+{
+  "nav_title": "Лайм Рецепты",
+  "name": "Лаймовая Книга Рецептов",
+  "short_name": "ЛаймРецепты",
+  "description": "Моя уютная домашняя книга рецептов",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f9e9",
+  "theme-color": "#1b4332",
+  "icons": [
+    {
+      "src": "https://flaticon.com",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
