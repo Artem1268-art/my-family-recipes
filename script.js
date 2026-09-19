@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     renderAll();
 
-    // ТУТ ИСПРАВЛЕНО: Скрипт сам увеличивает текстовые окна вниз при вводе длинного текста
     const autoResizeTextareas = document.querySelectorAll('textarea.auto-resize');
     autoResizeTextareas.forEach(textarea => {
         textarea.addEventListener('input', function() {
@@ -65,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     recipeImageInput.addEventListener('change', function(e) {
         const file = e.target.files;
-        if (file && file[0]) {
-            const fileName = file[0].name.length > 20 ? file[0].name.substring(0, 17) + '...' : file[0].name;
+        if (file && file) {
+            const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
             fileUploadLabel.classList.add('success');
             uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
             
@@ -99,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 img.src = event.target.result;
             };
-            reader.readAsDataURL(file[0]);
+            reader.readAsDataURL(file);
         }
     });
     function updateImageSize() {
@@ -133,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startDrag(e) {
         isDragging = true;
-        const touch = e.touches ? e.touches[0] : e;
+        const touch = e.touches ? e.touches : e;
         startX = touch.pageX - currentX;
         startY = touch.pageY - currentY;
         if (e.cancelable) e.preventDefault();
@@ -141,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function doDrag(e) {
         if (!isDragging) return;
-        const touch = e.touches ? e.touches[0] : e;
+        const touch = e.touches ? e.touches : e;
         currentX = touch.pageX - startX;
         currentY = touch.pageY - startY;
         constrainPosition();
@@ -187,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             openModal(); 
         });
     });
-       recipeForm.addEventListener('submit', function(e) {
+    recipeForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const idToEdit = editRecipeIdInput.value;
@@ -224,10 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 recipeForm.reset();
                 resetUploadStatus();
             }
-            
             saveAndRender();
-            
-            // ТУТ ИСПРАВЛЕНО: Вместо открытия полки openModal() мы создаем и показываем галочку добавлено
             showSuccessToast();
         };
 
@@ -246,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Функция для плавного показа красивой всплывающей галочки
     function showSuccessToast() {
         let toast = document.querySelector('.toast-success');
         if (!toast) {
@@ -256,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.appendChild(toast);
         }
         setTimeout(() => { toast.classList.add('show'); }, 50);
-        setTimeout(() => { toast.classList.remove('show'); }, 2000); // Через 2 секунды она сама плавно исчезнет
+        setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
 
     function startEditMode(recipe) {
@@ -284,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     function exitEditMode() {
         editRecipeIdInput.value = "";
         recipeForm.reset();
@@ -389,4 +385,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function saveAndRender() { localStorage.setItem('my_recipes', JSON.stringify(recipes)); renderAll(); }
 });
-
