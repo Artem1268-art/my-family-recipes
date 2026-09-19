@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             openModal(); 
         });
     });
-    recipeForm.addEventListener('submit', function(e) {
+        recipeForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const idToEdit = editRecipeIdInput.value;
@@ -223,8 +223,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 recipeForm.reset();
                 resetUploadStatus();
             }
+            
             saveAndRender();
-            showSuccessToast();
+            
+            // ТУТ ИСПРАВЛЕНО: Вызываем уведомление через таймаут, чтобы не вешать мобильный браузер
+            setTimeout(showSuccessToast, 50);
         };
 
         if (idToEdit && (!recipeImageInput.files || recipeImageInput.files.length === 0)) {
@@ -247,10 +250,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!toast) {
             toast = document.createElement('div');
             toast.className = 'toast-success';
-            toast.innerHTML = '✅ Добавлено! 🍋';
+            toast.innerHTML = '✅ Добавлено!';
             document.body.appendChild(toast);
         }
-        setTimeout(() => { toast.classList.add('show'); }, 50);
+        setTimeout(() => { toast.classList.add('show'); }, 30);
         setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
 
@@ -270,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         recipeForm.classList.add('edit-mode');
         formModeTitle.textContent = '✏️ Изменение рецепта';
-        submitFormBtn.textContent = 'Обновить рецепт 🌟';
+        submitFormBtn.textContent = 'Обновить рецепт ';
         cancelEditBtn.style.display = 'block';
 
         setTimeout(() => {
@@ -279,13 +282,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function exitEditMode() {
         editRecipeIdInput.value = "";
         recipeForm.reset();
         resetUploadStatus();
         recipeForm.classList.remove('edit-mode');
-        formModeTitle.textContent = '✨ Новый шедевр вкуса';
+        formModeTitle.textContent = ' Новый шедевр вкуса';
         submitFormBtn.textContent = 'Добавить в книгу 🥂';
         cancelEditBtn.style.display = 'none';
         setTimeout(() => { autoResizeTextareas.forEach(t => t.style.height = 'auto'); }, 50);
@@ -385,3 +387,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function saveAndRender() { localStorage.setItem('my_recipes', JSON.stringify(recipes)); renderAll(); }
 });
+
