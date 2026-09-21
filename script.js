@@ -54,9 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // ТУТ ИСПРАВЛЕНО: Полностью чистый, сверхустойчивый обработчик загрузки фото без старых функций
     recipeImageInput.addEventListener('change', function(e) {
-        const file = e.target.files;
-        if (file && file) {
+        const file = e.target.files[0];
+        if (file) {
             const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
             fileUploadLabel.classList.add('success');
             uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
@@ -144,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formattedDate = `📅 Добавлено: ${day}.${month}.${year}`;
 
                 const newRecipe = { 
-                    id: Date.now(), title, category, ingredients, process, image: finalImage, date: formattedDate 
+                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImage, date: formattedDate 
                 };
                 recipes.push(newRecipe);
                 recipeForm.reset();
@@ -175,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startEditMode(recipe) {
         closeModal(); 
-        // Закрываем окно детального просмотра, если оно открыто
         const singleModal = document.querySelector('.single-view-modal');
         if (singleModal) singleModal.style.display = 'none';
 
@@ -219,14 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderAll() { renderRecipes(); }
 
-    // ТУТ ИСПРАВЛЕНО: Сортировка оглавления строго по алфавиту от А до Я х3
     function renderRecipes() {
         recipesList.innerHTML = '';
         const searchText = searchInput.value.toLowerCase().trim();
-        
         const filtered = recipes.filter(r => r.category === currentCategory && r.title.toLowerCase().includes(searchText));
 
-        // Сортируем массив рецептов по названию буквы
         filtered.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
 
         if (filtered.length === 0) {
@@ -234,7 +231,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Рисуем легкие текстовые строчки вместо тяжелых карточек
         filtered.forEach(recipe => {
             const item = document.createElement('div');
             item.className = 'recipe-list-item';
@@ -244,7 +240,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Создаем красивое динамическое окно полного просмотра рецепта
     function openSingleView(recipe) {
         let singleModal = document.querySelector('.single-view-modal');
         if (!singleModal) {
@@ -284,9 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         singleModal.style.display = 'block';
 
-        // Логика кнопок внутри окна просмотра
         singleModal.querySelector('.single-view-close').onclick = () => { singleModal.style.display = 'none'; };
-        
         singleModal.querySelector('.edit-btn').onclick = () => { startEditMode(recipe); };
         
         singleModal.querySelector('.delete-btn').onclick = () => {
@@ -299,7 +292,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (recipeIdToDelete) {
             recipes = recipes.filter(item => item.id !== recipeIdToDelete);
             saveAndRender();
-            // Закрываем модалки
             deleteConfirmModal.classList.remove('open');
             const singleModal = document.querySelector('.single-view-modal');
             if (singleModal) singleModal.style.display = 'none';
