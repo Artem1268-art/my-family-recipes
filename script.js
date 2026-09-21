@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let recipes = JSON.parse(localStorage.getItem('my_recipes')) || [];
     let currentCategory = 'soups'; 
-    let temporaryImageBase64 = ""; // Храним сжатую картинку тут
+    let temporaryImageBase64 = ""; 
 
     const categoryNames = {
         soups: '🍲 Супы', meat: '🥩 Мясо', fish: '🐟 Рыба', salads: '🥗 Салаты', bakery: '🥐 Выпечка', pancakes: '🥞 Блинчики'
@@ -54,10 +54,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ТУТ ИСПРАВЛЕНО: Сверхлёгкое и сверхустойчивое автосжатие фото без глюков
     recipeImageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
+        const file = e.target.files;
+        if (file && file) {
             const fileName = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
             fileUploadLabel.classList.add('success');
             uploadStatusText.innerHTML = '✓ Выбрано: <strong>' + fileName + '</strong>';
@@ -70,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const ctx = canvas.getContext('2d');
                     let w = img.width;
                     let h = img.height;
-                    const max = 600; // Безопасный размер для localStorage телефона
+                    const max = 600;
                     if (w > h && w > max) { h *= max / w; w = max; }
                     else if (h > max) { w *= max / h; h = max; }
                     canvas.width = w;
@@ -78,8 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     ctx.drawImage(img, 0, 0, w, h);
                     
                     temporaryImageBase64 = canvas.toDataURL('image/jpeg', 0.82);
-                    
-                    // Показываем маленькое аккуратное превью загруженного фото
                     imagePreviewContainer.innerHTML = '<img src="' + temporaryImageBase64 + '" alt="Превью">';
                 };
                 img.src = event.target.result;
@@ -89,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     function resetUploadStatus() {
         fileUploadLabel.classList.remove('success');
-        uploadStatusText.textContent = '📸 Загрузить фото';
+        uploadStatusText.textContent = '📸 Загрузить сочное фото';
         imagePreviewContainer.innerHTML = '';
         temporaryImageBase64 = "";
     }
@@ -115,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
             openModal(); 
         });
     });
+
     recipeForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -124,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const ingredients = document.getElementById('recipe-ingredients').value;
         const process = document.getElementById('recipe-process').value;
 
-        // Если картинки нет и мы не редактируем старый рецепт — выдаём подсказку
         if (!temporaryImageBase64 && !idToEdit) {
             alert('Пожалуйста, сделайте или выберите фото блюда! 📸');
             return;
@@ -147,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formattedDate = `📅 Добавлено: ${day}.${month}.${year}`;
 
                 const newRecipe = { 
-                    id: Date.now(), title: title, category: category, ingredients: ingredients, process: process, image: finalImage, date: formattedDate 
+                    id: Date.now(), title, category, ingredients, process, image: finalImage, date: formattedDate 
                 };
                 recipes.push(newRecipe);
                 recipeForm.reset();
@@ -157,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(showSuccessToast, 50);
         };
 
-        // Если редактируем и не выбрали новое фото — оставляем старое
         if (idToEdit && !temporaryImageBase64) {
             const oldRecipe = recipes.find(item => item.id === parseInt(idToEdit));
             saveRecipeData(oldRecipe ? oldRecipe.image : "");
@@ -165,13 +161,12 @@ document.addEventListener('DOMContentLoaded', function() {
             saveRecipeData(temporaryImageBase64);
         }
     });
-
     function showSuccessToast() {
         let toast = document.querySelector('.toast-success');
         if (!toast) {
             toast = document.createElement('div');
             toast.className = 'toast-success';
-            toast.innerHTML = 'Добавлено!';
+            toast.innerHTML = '✅ Добавлено! 🍋';
             document.body.appendChild(toast);
         }
         setTimeout(() => { toast.classList.add('show'); }, 30);
@@ -180,6 +175,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startEditMode(recipe) {
         closeModal(); 
+        // Закрываем окно детального просмотра, если оно открыто
+        const singleModal = document.querySelector('.single-view-modal');
+        if (singleModal) singleModal.style.display = 'none';
+
         editRecipeIdInput.value = recipe.id;
         document.getElementById('recipe-title').value = recipe.title;
         document.getElementById('recipe-category').value = recipe.category;
@@ -193,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         recipeImageInput.required = false; 
 
         recipeForm.classList.add('edit-mode');
-        formModeTitle.textContent = 'Изменение рецепта';
+        formModeTitle.textContent = '✏️ Изменение рецепта';
         submitFormBtn.textContent = 'Обновить рецепт 🌟';
         cancelEditBtn.style.display = 'block';
 
@@ -209,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
         recipeForm.reset();
         resetUploadStatus();
         recipeForm.classList.remove('edit-mode');
-        formModeTitle.textContent = '✨ Новый шедевр вкуса';
+        formModeTitle.textContent = 'Новый шедевр вкуса';
         submitFormBtn.textContent = 'Добавить в книгу 🥂';
         cancelEditBtn.style.display = 'none';
         setTimeout(() => { autoResizeTextareas.forEach(t => t.style.height = 'auto'); }, 50);
@@ -220,70 +219,91 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderAll() { renderRecipes(); }
 
+    // ТУТ ИСПРАВЛЕНО: Сортировка оглавления строго по алфавиту от А до Я х3
     function renderRecipes() {
         recipesList.innerHTML = '';
         const searchText = searchInput.value.toLowerCase().trim();
+        
         const filtered = recipes.filter(r => r.category === currentCategory && r.title.toLowerCase().includes(searchText));
+
+        // Сортируем массив рецептов по названию буквы
+        filtered.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
 
         if (filtered.length === 0) {
             recipesList.innerHTML = '<p style="text-align: center; color: #2d6a4f; font-style: italic; padding: 20px;">На полке "' + categoryNames[currentCategory] + '" пока пусто...</p>';
             return;
         }
-        filtered.forEach(r => recipesList.appendChild(createCard(r)));
-        attachEvents();
+
+        // Рисуем легкие текстовые строчки вместо тяжелых карточек
+        filtered.forEach(recipe => {
+            const item = document.createElement('div');
+            item.className = 'recipe-list-item';
+            item.textContent = recipe.title;
+            item.onclick = () => { openSingleView(recipe); };
+            recipesList.appendChild(item);
+        });
     }
 
-    function createCard(recipe) {
-        const card = document.createElement('div');
-        card.className = 'recipe-card';
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'card-actions';
-
-        const btnEdit = document.createElement('button'); btnEdit.className = 'edit-btn'; btnEdit.textContent = 'Изменить ✏️'; btnEdit.setAttribute('data-id', recipe.id);
-        const btnDelete = document.createElement('button'); btnDelete.className = 'delete-btn'; btnDelete.textContent = 'Удалить 🗑️'; btnDelete.setAttribute('data-id', recipe.id);
-
-        actionsDiv.appendChild(btnEdit); actionsDiv.appendChild(btnDelete);
+    // Создаем красивое динамическое окно полного просмотра рецепта
+    function openSingleView(recipe) {
+        let singleModal = document.querySelector('.single-view-modal');
+        if (!singleModal) {
+            singleModal = document.createElement('div');
+            singleModal.className = 'single-view-modal';
+            document.body.appendChild(singleModal);
+        }
 
         let currentBadge = categoryNames[recipe.category] || '🍽️ Рецепт';
         let displayDate = recipe.date || `📅 Добавлено: ${new Date().toLocaleDateString('ru-RU')}`;
 
-        card.innerHTML = '<div class="recipe-card-image-wrap"><img src="' + recipe.image + '"></div>' +
-            '<div class="recipe-card-content">' +
-                '<h3>' + recipe.title + '</h3>' +
-                '<div class="recipe-date">' + displayDate + '</div>' + 
-                '<span class="recipe-badge">' + currentBadge + '</span>' +
-                '<div>' +
-                    '<div class="recipe-section-title">📋 Ингредиенты:</div>' +
-                    '<p>' + recipe.ingredients + '</p>' +
-                '</div>' +
-                '<div>' +
-                    '<div class="recipe-section-title">👩‍🍳 Приготовление:</div>' +
-                    '<p>' + recipe.process + '</p>' +
-                '</div>' +
-            '</div>';
+        singleModal.innerHTML = `
+            <div class="single-view-header">
+                <h2>${recipe.title}</h2>
+                <button class="single-view-close">×</button>
+            </div>
+            <div class="single-view-img-wrap">
+                <img src="${recipe.image}">
+            </div>
+            <div class="single-view-info">
+                <div class="recipe-date" style="margin: 0;">${displayDate}</div>
+                <span class="recipe-badge" style="margin-bottom: 10px;">${currentBadge}</span>
+                <div>
+                    <div class="recipe-section-title">📋 Ингредиенты:</div>
+                    <p style="white-space: pre-wrap; color: #40916c; line-height: 1.6; margin: 0;">${recipe.ingredients}</p>
+                </div>
+                <div>
+                    <div class="recipe-section-title">👩‍🍳 Приготовление:</div>
+                    <p style="white-space: pre-wrap; color: #40916c; line-height: 1.6; margin: 0;">${recipe.process}</p>
+                </div>
+                <div class="card-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="edit-btn" style="flex-grow: 1;">Изменить ✏️</button>
+                    <button class="delete-btn" style="background-color: #ff4d4d; color: white; flex-grow: 1;">Удалить 🗑️</button>
+                </div>
+            </div>
+        `;
 
-        card.querySelector('.recipe-card-content').appendChild(actionsDiv);
-        return card;
-    }
+        singleModal.style.display = 'block';
 
-    function attachEvents() {
-        document.querySelectorAll('.edit-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); const id = parseInt(e.target.getAttribute('data-id')); const r = recipes.find(item => item.id === id); if (r) startEditMode(r); }; });
+        // Логика кнопок внутри окна просмотра
+        singleModal.querySelector('.single-view-close').onclick = () => { singleModal.style.display = 'none'; };
         
-        document.querySelectorAll('.delete-btn').forEach(btn => { 
-            btn.onclick = (e) => { 
-                e.stopPropagation(); 
-                recipeIdToDelete = parseInt(btn.getAttribute('data-id')); 
-                deleteConfirmModal.classList.add('open');
-            }; 
-        });
+        singleModal.querySelector('.edit-btn').onclick = () => { startEditMode(recipe); };
+        
+        singleModal.querySelector('.delete-btn').onclick = () => {
+            recipeIdToDelete = recipe.id;
+            deleteConfirmModal.classList.add('open');
+        };
     }
 
     confirmYesBtn.onclick = function() {
         if (recipeIdToDelete) {
             recipes = recipes.filter(item => item.id !== recipeIdToDelete);
             saveAndRender();
+            // Закрываем модалки
+            deleteConfirmModal.classList.remove('open');
+            const singleModal = document.querySelector('.single-view-modal');
+            if (singleModal) singleModal.style.display = 'none';
         }
-        deleteConfirmModal.classList.remove('open');
         recipeIdToDelete = null;
     };
 
@@ -294,4 +314,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function saveAndRender() { localStorage.setItem('my_recipes', JSON.stringify(recipes)); renderAll(); }
 });
-
