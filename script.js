@@ -240,6 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ТУТ ИСПРАВЛЕНО: Кнопки перенесены в отдельный вертикальный блок single-view-actions х3
     function openSingleView(recipe) {
         let singleModal = document.querySelector('.single-view-modal');
         if (!singleModal) {
@@ -270,9 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="recipe-section-title">👩‍🍳 Приготовление:</div>
                     <p style="white-space: pre-wrap; color: #40916c; line-height: 1.6; margin: 0;">${recipe.process}</p>
                 </div>
-                <div class="card-actions" style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button class="edit-btn" style="flex-grow: 1;">Изменить ✏️</button>
-                    <button class="delete-btn" style="background-color: #ff4d4d; color: white; flex-grow: 1;">Удалить 🗑️</button>
+                <div class="single-view-actions">
+                    <button class="edit-btn">Изменить рецепт ✏️</button>
+                    <button class="delete-btn">Удалить из книги 🗑️</button>
                 </div>
             </div>
         `;
